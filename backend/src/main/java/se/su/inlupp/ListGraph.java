@@ -3,8 +3,14 @@ package se.su.inlupp;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.Map;
+import java.util.List;
+import java.util.HashMap; 
+import java.util.ArrayList;
 
 public class ListGraph<T> implements Graph<T> {
+
+  private final Map<T, List<Edge<T>>> nodes = new HashMap <>();
 
   @Override
   public void add(T node) {
