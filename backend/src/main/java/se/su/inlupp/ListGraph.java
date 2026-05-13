@@ -1,12 +1,6 @@
 package se.su.inlupp;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Set;
-import java.util.Map;
-import java.util.List;
-import java.util.HashMap; 
-import java.util.ArrayList;
+import java.util.*;
 
 public class ListGraph<T> implements Graph<T> {
 
@@ -14,7 +8,7 @@ public class ListGraph<T> implements Graph<T> {
 
   @Override
   public void add(T node) {
-    throw new UnsupportedOperationException("Unimplemented method 'add'");
+    nodes.putIfAbsent(node, new ArrayList<>());
   }
 
   @Override
@@ -29,7 +23,34 @@ public class ListGraph<T> implements Graph<T> {
 
   @Override
   public void connect(T node1, T node2, String name, int weight) {
-    throw new UnsupportedOperationException("Unimplemented method 'connect'");
+    
+    // Om någon av noderna saknas i grafen skall undantaget NoSuchElementException genereras.
+
+    if(!nodes.containsKey(node1) || !nodes.containsKey(node2))
+    {
+      throw new NoSuchElementException();
+    }
+
+    //Om vikten är negativ skall undantaget IllegalArgumentException genereras. 
+
+    if (weight < 0) 
+    {
+      throw new IllegalArgumentException();
+    }
+
+    //Om en kant redan finns mellan dessa två noder skall undantaget IllegalStateException genereras.
+
+    for (Edge<T> edge : nodes.get(node1)) 
+    {
+      if (edge.getDestination().equals(node2)) 
+        {
+          throw new IllegalStateException();
+        }
+    }
+
+    nodes.get(node1).add(new Edge<>(node2, name, weight));
+    nodes.get(node2).add(new Edge<>(node1, name, weight));
+
   }
 
   @Override
