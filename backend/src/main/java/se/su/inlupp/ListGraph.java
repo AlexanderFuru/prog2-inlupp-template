@@ -13,12 +13,29 @@ public class ListGraph<T> implements Graph<T> {
 
   @Override
   public void remove(T node) {
-    throw new UnsupportedOperationException("Unimplemented method 'remove'");
+
+    // Om noden saknas i grafen skall undantaget NoSuchElementException genereras.
+    if(!nodes.containsKey(node))
+    {
+      throw new NoSuchElementException();
+    }
+
+    List<Edge<T>> edges = nodes.get(node);
+
+    for(Edge <T> edge : edges)
+      {
+        T destination = edge.getDestination();
+
+        nodes.get(destination).removeIf(e -> e.getDestination().equals(node));
+      }
+
+    nodes.remove(node);
+    
   }
 
   @Override
   public boolean hasNode(T node) {
-    throw new UnsupportedOperationException("Unimplemented method 'hasNode'");
+   return nodes.containsKey(node);
   }
 
   @Override
@@ -55,7 +72,32 @@ public class ListGraph<T> implements Graph<T> {
 
   @Override
   public void disconnect(T node1, T node2) {
-    throw new UnsupportedOperationException("Unimplemented method 'disconnect'");
+    
+    if(!nodes.containsKey(node1) || !nodes.containsKey(node2))
+    {
+      throw new NoSuchElementException();
+    }
+
+    boolean found = false;
+
+    for (Edge<T> edge : nodes.get(node1)) 
+    {
+      if (edge.getDestination().equals(node2)) 
+        {
+          found = true;
+          break;
+        } 
+    }
+    
+    if (!found)
+      {
+          throw new IllegalStateException();
+      }
+      
+    nodes.get(node1).removeIf(e -> e.getDestination().equals(node2));
+
+    nodes.get(node2).removeIf(e -> e.getDestination().equals(node1));
+    
   }
 
   @Override
