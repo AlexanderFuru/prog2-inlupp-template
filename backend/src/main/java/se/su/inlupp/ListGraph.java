@@ -102,27 +102,95 @@ public class ListGraph<T> implements Graph<T> {
 
   @Override
   public void setConnectionWeight(T node1, T node2, int weight) {
-    throw new UnsupportedOperationException("Unimplemented method 'setConnectionWeight'");
+    
+    if(weight < 0)
+    {
+      throw new IllegalArgumentException();
+    }
+
+    if(!nodes.containsKey(node1) || !nodes.containsKey(node2))
+    {
+      throw new NoSuchElementException();
+    }
+
+    boolean found = false;
+
+    for (Edge<T> edge : nodes.get(node1)) 
+    {
+      if (edge.getDestination().equals(node2)) 
+        {
+          edge.setWeight(weight);
+          found = true;
+          break;
+        } 
+    }
+    
+    if (!found)
+      {
+          throw new NoSuchElementException();
+      }
+
+    for (Edge<T> edge : nodes.get(node2)) 
+    {
+      if (edge.getDestination().equals(node1)) 
+        {
+          edge.setWeight(weight);
+          break;
+        } 
+
+    }
+
   }
 
   @Override
   public Set<T> getNodes() {
-    throw new UnsupportedOperationException("Unimplemented method 'getNodes'");
+    
+    return new HashSet<>(nodes.keySet());
+
   }
 
   @Override
   public Collection<Edge<T>> getEdgesFrom(T node) {
-    throw new UnsupportedOperationException("Unimplemented method 'getEdgesFrom'");
+    if(!nodes.containsKey(node)){
+      throw new NoSuchElementException();
+    }
+
+     return new ArrayList<>(nodes.get(node));
   }
 
   @Override
   public Edge<T> getEdgeBetween(T node1, T node2) {
-    throw new UnsupportedOperationException("Unimplemented method 'getEdgeBetween'");
+    
+    if(!nodes.containsKey(node1) || !nodes.containsKey(node2))
+    {
+      throw new NoSuchElementException();
+    }
+
+     for (Edge<T> edge : nodes.get(node1)) 
+    {
+       if (edge.getDestination().equals(node2)) 
+        {
+          return edge;
+        } 
+    }
+  
+    return null;
+    
   }
+
+  public String toString(){
+    String result = "";
+
+    for (T node : nodes.keySet())
+      {
+        result += node + ": " + nodes.get(node) + "\n";
+      }
+      return result;
+  } 
 
   @Override
   public Iterator<T> iterator() {
-    throw new UnsupportedOperationException("Unimplemented method 'iterator'");
+    return nodes.keySet().iterator();
   }
 }
 
