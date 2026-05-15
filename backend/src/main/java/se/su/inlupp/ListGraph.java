@@ -20,7 +20,7 @@ public class ListGraph<T> implements Graph<T> {
       throw new NoSuchElementException();
     }
 
-    List<Edge<T>> edges = nodes.get(node);
+    List<Edge<T>> edges = new ArrayList<>(nodes.get(node));
 
     for(Edge <T> edge : edges)
       {
@@ -46,6 +46,13 @@ public class ListGraph<T> implements Graph<T> {
     if(!nodes.containsKey(node1) || !nodes.containsKey(node2))
     {
       throw new NoSuchElementException();
+    }
+
+    // enkla grafer är grafer utan kanter till start-noden själv
+
+    if(node1.equals(node2))
+    {
+      throw new IllegalArgumentException();
     }
 
     //Om vikten är negativ skall undantaget IllegalArgumentException genereras. 
