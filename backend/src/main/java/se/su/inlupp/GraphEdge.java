@@ -5,7 +5,7 @@ public class GraphEdge<T> implements Edge<T> {
     private final String name;
     private int weight;
 
-    public GraphEdge(T destination, int weight, String name) {
+    public GraphEdge(T destination, String name, int weight) {
         this.destination = destination;
         this.weight = weight;
         this.name = name;

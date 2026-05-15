@@ -1,6 +1,14 @@
 package se.su.inlupp;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Set;
 
 public class ListGraph<T> implements Graph<T> {
 
@@ -72,8 +80,8 @@ public class ListGraph<T> implements Graph<T> {
         }
     }
 
-    nodes.get(node1).add(new Edge<>(node2, name, weight));
-    nodes.get(node2).add(new Edge<>(node1, name, weight));
+    nodes.get(node1).add(new GraphEdge<>(node2, name, weight));
+    nodes.get(node2).add(new GraphEdge<>(node1, name, weight));
 
   }
 
