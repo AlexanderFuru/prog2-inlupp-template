@@ -179,13 +179,13 @@ public class ListGraph<T> implements Graph<T> {
   }
 
   public String toString(){
-    String result = "";
+    StringBuilder sb = new StringBuilder();
 
-    for (T node : nodes.keySet())
+    for (Map.Entry<T, List<Edge<T>>> entry : nodes.entrySet())
       {
-        result += node + ": " + nodes.get(node) + "\n";
+        sb.append(entry.getKey()).append(": ").append(entry.getValue()).append("\n");
       }
-      return result;
+      return sb.toString();
   } 
 
   @Override
