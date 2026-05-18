@@ -18,6 +18,10 @@ public class GraphEdge<T> implements Edge<T> {
 
     @Override
     public void setWeight(int weight) {
+        if (weight < 0) {
+            throw new IllegalArgumentException();
+        }
+
         this.weight = weight;
     }
 
@@ -33,7 +37,7 @@ public class GraphEdge<T> implements Edge<T> {
 
     @Override
     public String toString() {
-        return name + " till " + destination + " (Vikt: " + weight + ")";
+        return "till " + destination + " med " + name + " tar " + weight;
     }
 }
 
