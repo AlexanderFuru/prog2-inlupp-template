@@ -5,7 +5,6 @@ public class DFSPathFinder<T> implements PathFinder<T> {
 
     @Override
     public Path<T> findPath(Graph<T> graph, T from, T to) {
-
         if (!graph.hasNode(from) || !graph.hasNode(to)) {
             return null;
         }
@@ -14,38 +13,26 @@ public class DFSPathFinder<T> implements PathFinder<T> {
         List<Edge<T>> path = new ArrayList<>();
 
         boolean found = dfs(graph, from, to, visited, path);
-
         if (!found) {
             return null;
         }
-
         return new SimplePath<>(from, path);
     }
 
-    private boolean dfs(Graph<T> graph,
-                        T current,
-                        T goal,
-                        Set<T> visited,
-                        List<Edge<T>> path) {
-
+    private boolean dfs(Graph<T> graph, T current, T goal, Set<T> visited, List<Edge<T>> path) {
         if (current.equals(goal)) {
             return true;
         }
-
         visited.add(current);
 
         for (Edge<T> edge : graph.getEdgesFrom(current)) {
-
             T next = edge.getDestination();
-
             if (!visited.contains(next)) {
-
                 path.add(edge);
 
                 if (dfs(graph, next, goal, visited, path)) {
                     return true;
                 }
-
                 path.remove(path.size() - 1);
             }
         }
@@ -54,7 +41,6 @@ public class DFSPathFinder<T> implements PathFinder<T> {
     }
 
     private static class SimplePath<T> implements Path<T> {
-
         private final T start;
         private final List<Edge<T>> edges;
 
@@ -73,18 +59,15 @@ public class DFSPathFinder<T> implements PathFinder<T> {
             if (edges.isEmpty()) {
                 return start;
             }
-
             return edges.get(edges.size() - 1).getDestination();
         }
 
         @Override
         public int getTotalWeight() {
             int total = 0;
-
             for (Edge<T> edge : edges) {
                 total += edge.getWeight();
             }
-
             return total;
         }
 
@@ -95,14 +78,12 @@ public class DFSPathFinder<T> implements PathFinder<T> {
 
         @Override
         public List<T> getNodes() {
-
             List<T> nodes = new ArrayList<>();
             nodes.add(start);
 
             for (Edge<T> edge : edges) {
                 nodes.add(edge.getDestination());
             }
-
             return nodes;
         }
 
@@ -113,8 +94,7 @@ public class DFSPathFinder<T> implements PathFinder<T> {
 
         @Override
         public String toString() {
-            return "Path: " + getNodes() +
-                    ", total weight = " + getTotalWeight();
+            return "Path: " + getNodes() + ", total weight = " + getTotalWeight();
         }
     }
 }
