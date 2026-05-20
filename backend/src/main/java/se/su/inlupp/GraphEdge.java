@@ -5,7 +5,7 @@ public class GraphEdge<T> implements Edge<T> {
     private final String name;
     private int weight;
 
-    public GraphEdge(T destination, int weight, String name) {
+    public GraphEdge(T destination, String name, int weight) {
         this.destination = destination;
         this.weight = weight;
         this.name = name;
@@ -18,6 +18,10 @@ public class GraphEdge<T> implements Edge<T> {
 
     @Override
     public void setWeight(int weight) {
+        if (weight < 0) {
+            throw new IllegalArgumentException();
+        }
+
         this.weight = weight;
     }
 
@@ -33,7 +37,7 @@ public class GraphEdge<T> implements Edge<T> {
 
     @Override
     public String toString() {
-        return name + " till " + destination + " (Vikt: " + weight + ")";
+        return "till " + destination + " med " + name + " tar " + weight;
     }
 }
 
