@@ -17,11 +17,11 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 public class MainView extends BorderPane {
+
+    private Map map;
     
     public MainView() {
-
         setupLayout();
-
     }
 
     private void setupLayout() {
@@ -31,6 +31,9 @@ public class MainView extends BorderPane {
 
         VBox topContainer = new VBox(menuBar, toolBar);
         this.setTop(topContainer);
+
+        this.map = new Map();
+        this.setCenter(map);
     }
 
     private MenuBar createMenuBar() {
@@ -77,6 +80,17 @@ public class MainView extends BorderPane {
 
     private void handleNewMap() {
         System.out.println("Operation -Create new map- has been chosen");
+
+        javafx.stage.FileChooser fileChooser = new javafx.stage.FileChooser();
+        fileChooser.setTitle("Select background image");
+        fileChooser.getExtensionFilters().add(new javafx.stage.FileChooser.ExtensionFilter("Images (*.png, *.jpg)", "*.png", "*.jpg"));
+
+        Stage stage = (Stage) this.getScene().getWindow();
+        File file = fileChooser.showOpenDialog(stage);
+
+        if (file != null) {
+            map.setBackgroundImage(file);
+        }
     }
 
     private void handleOpen() {
