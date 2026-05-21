@@ -21,7 +21,7 @@ public class EdgeLine extends Line {
 
         this.startXProperty().bind(fromStationView.centerXProperty());
         this.startYProperty().bind(fromStationView.centerYProperty());
-        this.endXProperty().bind(fromStationView.centerXProperty());
+        this.endXProperty().bind(toStationView.centerXProperty());
         this.endYProperty().bind(toStationView.centerYProperty());
 
         this.toBack();

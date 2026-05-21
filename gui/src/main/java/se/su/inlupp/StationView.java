@@ -24,7 +24,16 @@ public class StationView extends Circle{
         this.label = new Text(station.getName());
         this.label.setFont(Font.font("Arial", FontWeight.BOLD, 12));
 
-        //updateLabelPosition();
+        updateLabelPosition();
+
+        this.setOnMouseClicked(e -> {
+            if (this.getParent() instanceof Map map && map.isConnecting) {
+                map.chooseConnectingStations(this);
+
+                e.consume();
+            }
+
+        });
 
         setupDragAndDrop();
     }

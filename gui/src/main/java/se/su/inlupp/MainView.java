@@ -68,6 +68,9 @@ public class MainView extends BorderPane {
         Button newStationButton = new Button("Add station");
         newStationButton.setOnAction(e -> handleNewStation());
 
+        Button connectStationsButton = new Button("Connect stations");
+        connectStationsButton.setOnAction(e -> handleConnectStations());
+
         Button findRouteButton = new Button("Find route");
         findRouteButton.setOnAction(e -> handleFindRoute());
 
@@ -76,7 +79,7 @@ public class MainView extends BorderPane {
         algorithmBox.setValue("Fastest route (BFS)");
         algorithmBox.setOnAction(e -> handleAlgorithmChange(algorithmBox.getValue() ));
 
-        toolBar.getItems().addAll(newStationButton, findRouteButton, new Separator(), new Label("Algorithm: "), algorithmBox);
+        toolBar.getItems().addAll(newStationButton, connectStationsButton, findRouteButton, new Separator(), new Label("Algorithm: "), algorithmBox);
 
         return toolBar;
     }
@@ -124,8 +127,12 @@ public class MainView extends BorderPane {
         int index = new Random().nextInt(stationNames.length);
         Station newStation = new Station(stationNames[index]);
 
-        map.addStationToCanvas(newStation, newStationSpawnPositionX, newStationSpawnPositionY);
+        map.addStationToMap(newStation, newStationSpawnPositionX, newStationSpawnPositionY);
         System.out.println("Operation -New station- has been chosen");
+    }
+
+    private void handleConnectStations() {
+        map.startConnectingStations();
     }
 
     private void handleFindRoute() {
