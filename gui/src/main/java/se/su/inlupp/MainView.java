@@ -1,6 +1,7 @@
 package se.su.inlupp;
 
 import java.io.File;
+import java.util.Random;
 
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -19,6 +20,8 @@ import javafx.stage.Stage;
 public class MainView extends BorderPane {
 
     private Map map;
+    private final double newStationSpawnPositionX = 45;
+    private final double newStationSpawnPositionY = 35;
     
     public MainView() {
         setupLayout();
@@ -117,6 +120,11 @@ public class MainView extends BorderPane {
     }
 
     private void handleNewStation() {
+        String[] stationNames = {"T-Centralen", "Gamla Stan", "Slussen", "Rådmansgatan", "Tekniska Högskolan"};
+        int index = new Random().nextInt(stationNames.length);
+        Station newStation = new Station(stationNames[index]);
+
+        map.addStationToCanvas(newStation, newStationSpawnPositionX, newStationSpawnPositionY);
         System.out.println("Operation -New station- has been chosen");
     }
 

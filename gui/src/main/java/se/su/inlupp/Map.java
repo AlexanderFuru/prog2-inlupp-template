@@ -42,4 +42,10 @@ public class Map extends Pane {
     private void handleMapClick(double x, double y) {
         System.out.println("Input detected at " + x + ", " + y);
     }
+
+    public void addStationToCanvas(Station staion, double x, double y) {
+        StationView stationView = new StationView(staion, x, y);
+
+        this.getChildren().addAll(stationView.getLabel(), stationView);
+    }
 }
