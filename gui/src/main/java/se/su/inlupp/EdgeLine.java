@@ -35,7 +35,7 @@ public class EdgeLine extends Line {
         return fromStationView;
     }
 
-    public StationView getTStationView() {
+    public StationView getToStationView() {
         return toStationView;
     }
 }

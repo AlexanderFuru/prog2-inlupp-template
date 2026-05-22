@@ -30,6 +30,12 @@ public class StationView extends Circle{
 
                 e.consume();
             }
+
+            if (this.getParent() instanceof Map map && map.isRemoving) {
+                map.chooseStationToRemove(this);
+
+                e.consume();
+            }
         });
 
         dragAndDrop();

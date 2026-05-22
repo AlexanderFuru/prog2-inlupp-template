@@ -1,6 +1,8 @@
 package se.su.inlupp;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import javafx.scene.control.Alert;
@@ -13,8 +15,10 @@ public class Map extends Pane {
     private final ImageView backgroundImageView;
 
     private StationView firstSelectedStation;
+    private StationView stationToRemove;
 
     protected boolean isConnecting = false;
+    protected boolean isRemoving = false;
 
     public Map() {
         this.backgroundImageView = new ImageView();
@@ -55,6 +59,11 @@ public class Map extends Pane {
                 System.out.println("Connect mode has been canceled");
                 return;
             }
+        }
+
+        if (isRemoving) {
+            isRemoving = false;
+            System.out.println("Station remove mode has been canceled");
         }
 
         handleNewStation(x, y);
@@ -138,4 +147,40 @@ public class Map extends Pane {
 
         edgeView.toBack();
     }
+
+    public void startRemovingStation() {
+        isRemoving = true;
+        stationToRemove = null;
+    }
+
+    public void chooseStationToRemove(StationView clickedStation) {
+        if (stationToRemove == null) {
+            stationToRemove = clickedStation;
+            removeStation(clickedStation);
+        }
+    }
+
+    private void removeStation(StationView clickedStaion) {
+        Station station = clickedStaion.getStation();
+
+        List<EdgeLine> linesToRemove = new ArrayList<>();
+        for (javafx.scene.Node node : this.getChildren()) {
+            if (node instanceof EdgeLine edgeLine) {
+                if (edgeLine.getFromStationView() == stationToRemove || edgeLine.getToStationView() == stationToRemove) {
+                    linesToRemove.add(edgeLine);
+                }
+            }
+        }
+
+        this.getChildren().removeAll(linesToRemove);
+        this.getChildren().remove(stationToRemove);
+        this.getChildren().remove(stationToRemove.getLabel());
+
+        //Skicka till modellen att station ska tas bort
+        
+        System.out.println(stationToRemove.getStation().getName() + " Has been removed");
+        System.out.println("Exiting station remove mode");
+        stationToRemove = null;
+        isRemoving = false;
+    }     
 }

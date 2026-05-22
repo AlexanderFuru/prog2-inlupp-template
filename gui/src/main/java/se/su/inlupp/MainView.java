@@ -62,8 +62,11 @@ public class MainView extends BorderPane {
     private ToolBar createToolBar() {
         ToolBar toolBar = new ToolBar();
 
-        Button connectStationsClickButton = new Button("Connect stations by clicking");
+        Button connectStationsClickButton = new Button("Connect stations");
         connectStationsClickButton.setOnAction(e -> handleConnectStations());
+
+        Button removeStationButton = new Button("Remove station");
+        removeStationButton.setOnAction(e -> handleRemoveStation());
 
         Button findRouteButton = new Button("Find route");
         findRouteButton.setOnAction(e -> handleFindRoute());
@@ -73,7 +76,7 @@ public class MainView extends BorderPane {
         algorithmBox.setValue("Fastest route (BFS)");
         algorithmBox.setOnAction(e -> handleAlgorithmChange(algorithmBox.getValue() ));
 
-        toolBar.getItems().addAll(connectStationsClickButton, findRouteButton, new Separator(), new Label("Algorithm: "), algorithmBox);
+        toolBar.getItems().addAll(connectStationsClickButton, removeStationButton, findRouteButton, new Separator(), new Label("Algorithm: "), algorithmBox);
 
         return toolBar;
     }
@@ -118,6 +121,10 @@ public class MainView extends BorderPane {
 
     private void handleConnectStations() {
         map.startConnectingStations();
+    }
+
+    private void handleRemoveStation() {
+        map.startRemovingStation();
     }
 
     private void handleFindRoute() {
