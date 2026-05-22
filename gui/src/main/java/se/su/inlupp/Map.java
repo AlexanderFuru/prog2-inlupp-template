@@ -44,6 +44,15 @@ public class Map extends Pane {
     }
 
     private void handleMapClick(double x, double y) {
+        if (isConnecting) {
+            isConnecting = false;
+
+            if (firstSelectedStation != null)
+                firstSelectedStation.setFill(javafx.scene.paint.Color.WHITE);
+
+            System.out.println("Connect mode has been canceled");
+        }
+            
         System.out.println("Input detected at " + x + ", " + y);
     }
 
@@ -75,7 +84,8 @@ public class Map extends Pane {
             se.su.inlupp.GraphEdge<se.su.inlupp.Station> testEdge = new se.su.inlupp.GraphEdge<Station>(clickedStation.getStation(), "TestLine", 5);
 
             connectStations(firstSelectedStation, clickedStation, testEdge);
-
+            
+            firstSelectedStation.setFill(javafx.scene.paint.Color.WHITE);
             System.out.println("Stations " + firstSelectedStation.getStation().getName() + " and " + clickedStation.getStation().getName() + " have been connected");
             System.out.println("Exiting connect mode");
             isConnecting = false;

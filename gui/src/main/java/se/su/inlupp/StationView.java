@@ -35,7 +35,7 @@ public class StationView extends Circle{
 
         });
 
-        setupDragAndDrop();
+        dragAndDrop();
     }
 
     public Station getStation() {
@@ -51,7 +51,7 @@ public class StationView extends Circle{
         this.label.setY(this.getCenterY() - 18);
     }
 
-    private void setupDragAndDrop() {
+    private void dragAndDrop() {
         this.setOnMousePressed(event -> {
             mouseStartPositionX = event.getX() - this.getCenterX();
             mouseStartPositionY = event.getY() - this.getCenterY();
