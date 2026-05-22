@@ -32,6 +32,8 @@ public class Map extends Pane {
         setupMouseListeners();
     }
 
+    //#region Map
+
     public void setBackgroundImage(File imageFile) {
         if (imageFile != null && imageFile.exists()) {
             Image image = new Image(imageFile.toURI().toString());
@@ -73,6 +75,10 @@ public class Map extends Pane {
         System.out.println("Input detected at " + x + ", " + y);
     }
 
+    //#endregion
+
+    //#region AddObjects
+
     public void handleNewStation(double mouseClickX, double mouseClickY) {
         TextInputDialog dialog = new TextInputDialog();
         dialog.setTitle("New station");
@@ -95,6 +101,9 @@ public class Map extends Pane {
             }
 
             Station newStation = new Station(stationName);
+
+            //Skicka till modellen att den ska lägga till den nya noden
+
             addStationToMap(newStation, mouseClickX, mouseClickY);
 
             System.out.println("New station has been created: " + stationName);
@@ -106,6 +115,10 @@ public class Map extends Pane {
 
         this.getChildren().addAll(stationView.getLabel(), stationView);
     }
+
+    //#endregion
+
+    //#region Connect Objects
 
     public void startConnectingStations() {
         this.isConnecting = true;
@@ -145,10 +158,16 @@ public class Map extends Pane {
     private void connectStations(StationView station1, StationView station2, GraphEdge<Station> edge) {
         EdgeLine edgeView = new EdgeLine(station1, station2, edge);
 
+        //Skicka till modellen att den ska koppla två noder
+
         this.getChildren().add(edgeView);
 
         edgeView.toBack();
     }
+
+    //#endregion
+
+    //#region Remove Objects
 
     public void startRemovingObject() {
         isRemoving = true;
@@ -204,4 +223,6 @@ public class Map extends Pane {
         lineToRemove = null;
         isRemoving = false;
     }
+
+    //#endregion
 }

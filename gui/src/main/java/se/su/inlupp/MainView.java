@@ -24,6 +24,8 @@ public class MainView extends BorderPane {
         setupLayout();
     }
 
+    //#region Layout
+
     private void setupLayout() {
         MenuBar menuBar = createMenuBar();
 
@@ -80,6 +82,10 @@ public class MainView extends BorderPane {
 
         return toolBar;
     }
+
+    //#endregion
+
+    //#region Handle Methods
 
     private void handleNewMap() {
         System.out.println("Operation -Create new map- has been chosen");
@@ -139,4 +145,6 @@ public class MainView extends BorderPane {
             System.out.println("Fewest transfers has been chosen");
         }
     }
+
+    //#endregion
 }
