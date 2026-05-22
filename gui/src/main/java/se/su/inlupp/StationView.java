@@ -17,22 +17,19 @@ public class StationView extends Circle{
         super(x, y, 16);
         this.station = station;
 
-        this.setFill(Color.CORNFLOWERBLUE);
+        this.setFill(Color.WHITE);
         this.setStroke(Color.BLACK);
         this.setStrokeWidth(2);
 
         this.label = new Text(station.getName());
         this.label.setFont(Font.font("Arial", FontWeight.BOLD, 12));
 
-        updateLabelPosition();
-
         this.setOnMouseClicked(e -> {
             if (this.getParent() instanceof Map map && map.isConnecting) {
-                map.chooseConnectingStationsClick(this);
+                map.chooseConnectingStations(this);
 
                 e.consume();
             }
-
         });
 
         dragAndDrop();

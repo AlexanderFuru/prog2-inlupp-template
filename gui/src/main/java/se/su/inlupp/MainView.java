@@ -63,7 +63,7 @@ public class MainView extends BorderPane {
         ToolBar toolBar = new ToolBar();
 
         Button connectStationsClickButton = new Button("Connect stations by clicking");
-        connectStationsClickButton.setOnAction(e -> handleConnectStationsClick());
+        connectStationsClickButton.setOnAction(e -> handleConnectStations());
 
         Button findRouteButton = new Button("Find route");
         findRouteButton.setOnAction(e -> handleFindRoute());
@@ -116,8 +116,8 @@ public class MainView extends BorderPane {
         System.out.println("Operation -Exit- has been chosen");
     }
 
-    private void handleConnectStationsClick() {
-        map.startConnectingStationsClick();
+    private void handleConnectStations() {
+        map.startConnectingStations();
     }
 
     private void handleFindRoute() {
