@@ -65,8 +65,8 @@ public class MainView extends BorderPane {
         Button connectStationsClickButton = new Button("Connect stations");
         connectStationsClickButton.setOnAction(e -> handleConnectStations());
 
-        Button removeStationButton = new Button("Remove station");
-        removeStationButton.setOnAction(e -> handleRemoveStation());
+        Button removeStationButton = new Button("Remove object");
+        removeStationButton.setOnAction(e -> handleRemoveObject());
 
         Button findRouteButton = new Button("Find route");
         findRouteButton.setOnAction(e -> handleFindRoute());
@@ -123,8 +123,8 @@ public class MainView extends BorderPane {
         map.startConnectingStations();
     }
 
-    private void handleRemoveStation() {
-        map.startRemovingStation();
+    private void handleRemoveObject() {
+        map.startRemovingObject();
     }
 
     private void handleFindRoute() {

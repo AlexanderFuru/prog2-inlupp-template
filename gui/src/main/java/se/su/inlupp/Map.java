@@ -17,6 +17,8 @@ public class Map extends Pane {
     private StationView firstSelectedStation;
     private StationView stationToRemove;
 
+    private EdgeLine lineToRemove;
+
     protected boolean isConnecting = false;
     protected boolean isRemoving = false;
 
@@ -148,15 +150,23 @@ public class Map extends Pane {
         edgeView.toBack();
     }
 
-    public void startRemovingStation() {
+    public void startRemovingObject() {
         isRemoving = true;
         stationToRemove = null;
+        lineToRemove = null;
     }
 
     public void chooseStationToRemove(StationView clickedStation) {
         if (stationToRemove == null) {
             stationToRemove = clickedStation;
             removeStation(clickedStation);
+        }
+    }
+
+    public void chooseLineToRemove(EdgeLine clickedLine) {
+        if (lineToRemove == null) {
+            lineToRemove = clickedLine;
+            removeLine(clickedLine);
         }
     }
 
@@ -182,5 +192,16 @@ public class Map extends Pane {
         System.out.println("Exiting station remove mode");
         stationToRemove = null;
         isRemoving = false;
-    }     
+    }
+
+    private void removeLine(EdgeLine clickedLine) {
+        GraphEdge<Station> edge = clickedLine.getEdgeData();
+
+        //Skicka till modellen att edge ska tas bort
+
+        this.getChildren().remove(clickedLine);
+        System.out.println(clickedLine.getEdgeData().getName() + " has been removed");
+        lineToRemove = null;
+        isRemoving = false;
+    }
 }

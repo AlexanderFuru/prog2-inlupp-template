@@ -25,6 +25,14 @@ public class EdgeLine extends Line {
         this.endYProperty().bind(toStationView.centerYProperty());
 
         this.toBack();
+
+        this.setOnMouseClicked(e -> {
+            if (this.getParent() instanceof Map map && map.isRemoving) {
+                map.chooseLineToRemove(this);
+
+                e.consume();
+            }
+        });
     }
 
     public GraphEdge<Station> getEdgeData() {
