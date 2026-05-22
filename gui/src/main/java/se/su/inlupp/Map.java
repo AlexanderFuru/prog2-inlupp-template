@@ -1,7 +1,10 @@
 package se.su.inlupp;
 
 import java.io.File;
+import java.util.Optional;
 
+import javafx.scene.control.Alert;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
@@ -11,7 +14,7 @@ public class Map extends Pane {
 
     private StationView firstSelectedStation;
 
-    public boolean isConnecting = false;
+    protected boolean isConnecting = false;
 
     public Map() {
         this.backgroundImageView = new ImageView();
@@ -47,13 +50,44 @@ public class Map extends Pane {
         if (isConnecting) {
             isConnecting = false;
 
-            if (firstSelectedStation != null)
+            if (firstSelectedStation != null) {
                 firstSelectedStation.setFill(javafx.scene.paint.Color.WHITE);
-
-            System.out.println("Connect mode has been canceled");
+                System.out.println("Connect mode has been canceled");
+                return;
+            }
         }
+
+        handleNewStation(x, y);
             
         System.out.println("Input detected at " + x + ", " + y);
+    }
+
+    public void handleNewStation(double mouseClickX, double mouseClickY) {
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("New station");
+        dialog.setHeaderText("Add new station");
+        dialog.setContentText("Enter station name");
+
+        Optional<String> result = dialog.showAndWait();
+
+        if (result.isPresent()) {
+            String stationName = result.get().trim();
+
+            if (stationName.isEmpty()) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Invalid input");
+                alert.setHeaderText("Invalid name");
+                alert.setContentText("Station name may not be empty, please enter station name");
+                alert.showAndWait();
+                handleNewStation(mouseClickX, mouseClickY);
+                return;
+            }
+
+            Station newStation = new Station(stationName);
+            addStationToMap(newStation, mouseClickX, mouseClickY);
+
+            System.out.println("New station has been created: " + stationName);
+        }
     }
 
     public void addStationToMap(Station staion, double x, double y) {
@@ -62,13 +96,13 @@ public class Map extends Pane {
         this.getChildren().addAll(stationView.getLabel(), stationView);
     }
 
-    public void startConnectingStations() {
+    public void startConnectingStationsClick() {
         this.isConnecting = true;
         this.firstSelectedStation = null;
         System.out.println("Connecting stations...Choose the first station");
     }
 
-    public void chooseConnectingStations(StationView clickedStation) {
+    public void chooseConnectingStationsClick(StationView clickedStation) {
         if (firstSelectedStation == null) {
             firstSelectedStation = clickedStation;
             firstSelectedStation.setFill(javafx.scene.paint.Color.GREEN);

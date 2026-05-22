@@ -28,7 +28,7 @@ public class StationView extends Circle{
 
         this.setOnMouseClicked(e -> {
             if (this.getParent() instanceof Map map && map.isConnecting) {
-                map.chooseConnectingStations(this);
+                map.chooseConnectingStationsClick(this);
 
                 e.consume();
             }

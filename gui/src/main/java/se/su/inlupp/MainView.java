@@ -1,7 +1,6 @@
 package se.su.inlupp;
 
 import java.io.File;
-import java.util.Random;
 
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -20,8 +19,6 @@ import javafx.stage.Stage;
 public class MainView extends BorderPane {
 
     private Map map;
-    private final double newStationSpawnPositionX = 45;
-    private final double newStationSpawnPositionY = 35;
     
     public MainView() {
         setupLayout();
@@ -65,11 +62,8 @@ public class MainView extends BorderPane {
     private ToolBar createToolBar() {
         ToolBar toolBar = new ToolBar();
 
-        Button newStationButton = new Button("Add station");
-        newStationButton.setOnAction(e -> handleNewStation());
-
-        Button connectStationsButton = new Button("Connect stations");
-        connectStationsButton.setOnAction(e -> handleConnectStations());
+        Button connectStationsClickButton = new Button("Connect stations by clicking");
+        connectStationsClickButton.setOnAction(e -> handleConnectStationsClick());
 
         Button findRouteButton = new Button("Find route");
         findRouteButton.setOnAction(e -> handleFindRoute());
@@ -79,7 +73,7 @@ public class MainView extends BorderPane {
         algorithmBox.setValue("Fastest route (BFS)");
         algorithmBox.setOnAction(e -> handleAlgorithmChange(algorithmBox.getValue() ));
 
-        toolBar.getItems().addAll(newStationButton, connectStationsButton, findRouteButton, new Separator(), new Label("Algorithm: "), algorithmBox);
+        toolBar.getItems().addAll(connectStationsClickButton, findRouteButton, new Separator(), new Label("Algorithm: "), algorithmBox);
 
         return toolBar;
     }
@@ -122,17 +116,8 @@ public class MainView extends BorderPane {
         System.out.println("Operation -Exit- has been chosen");
     }
 
-    private void handleNewStation() {
-        String[] stationNames = {"T-Centralen", "Gamla Stan", "Slussen", "Rådmansgatan", "Tekniska Högskolan"};
-        int index = new Random().nextInt(stationNames.length);
-        Station newStation = new Station(stationNames[index]);
-
-        map.addStationToMap(newStation, newStationSpawnPositionX, newStationSpawnPositionY);
-        System.out.println("Operation -New station- has been chosen");
-    }
-
-    private void handleConnectStations() {
-        map.startConnectingStations();
+    private void handleConnectStationsClick() {
+        map.startConnectingStationsClick();
     }
 
     private void handleFindRoute() {
