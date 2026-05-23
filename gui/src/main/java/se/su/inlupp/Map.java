@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 import javafx.scene.control.Alert;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -18,6 +19,7 @@ public class Map extends Pane {
     private StationView stationToRemove;
 
     private EdgeLine lineToRemove;
+    private TransitLine currentTransitLine;
 
     protected boolean isConnecting = false;
     protected boolean isRemoving = false;
@@ -67,7 +69,7 @@ public class Map extends Pane {
 
         if (isRemoving) {
             isRemoving = false;
-            System.out.println("Station remove mode has been canceled");
+            System.out.println("Remove mode has been canceled");
         }
 
         handleNewStation(x, y);
@@ -102,7 +104,7 @@ public class Map extends Pane {
 
             Station newStation = new Station(stationName);
 
-            //Skicka till modellen att den ska lägga till den nya noden
+            //Skicka till modellen att den ska lägga till den nya noden istället
 
             addStationToMap(newStation, mouseClickX, mouseClickY);
 
@@ -114,6 +116,10 @@ public class Map extends Pane {
         StationView stationView = new StationView(staion, x, y);
 
         this.getChildren().addAll(stationView.getLabel(), stationView);
+    }
+
+    public void setCurrentTransitLine(ComboBox<TransitLine> transitLineSelectionBox) {
+        currentTransitLine = transitLineSelectionBox.getValue();
     }
 
     //#endregion
@@ -142,7 +148,7 @@ public class Map extends Pane {
             if (input.isPresent()) {
                 DialogHandler.LineInputData inputData = input.get();
 
-                se.su.inlupp.GraphEdge<se.su.inlupp.Station> testEdge = new se.su.inlupp.GraphEdge<>(clickedStation.getStation(), inputData.name, inputData.weight);
+                se.su.inlupp.GraphEdge<se.su.inlupp.Station> testEdge = new se.su.inlupp.GraphEdge<>(clickedStation.getStation(), currentTransitLine.getName(), inputData.weight);
                 System.out.println("Second station has been selected: " + clickedStation.getStation().getName());
                 connectStations(firstSelectedStation, clickedStation, testEdge);
             }
@@ -156,7 +162,7 @@ public class Map extends Pane {
     }
 
     private void connectStations(StationView station1, StationView station2, GraphEdge<Station> edge) {
-        EdgeLine edgeView = new EdgeLine(station1, station2, edge);
+        EdgeLine edgeView = new EdgeLine(station1, station2, edge, currentTransitLine.getColor());
 
         //Skicka till modellen att den ska koppla två noder
 

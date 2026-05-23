@@ -11,12 +11,12 @@ public class EdgeLine extends Line {
 
     private final int lineWidth = 4;
 
-    public EdgeLine(StationView fromStationView, StationView toStationView, GraphEdge<Station> edgeData) {
+    public EdgeLine(StationView fromStationView, StationView toStationView, GraphEdge<Station> edgeData, Color color) {
         this.fromStationView = fromStationView;
         this.toStationView = toStationView;
         this.edgeData = edgeData;
 
-        this.setStroke(Color.RED);
+        this.setStroke(color);
         this.setStrokeWidth(lineWidth);
 
         this.startXProperty().bind(fromStationView.centerXProperty());

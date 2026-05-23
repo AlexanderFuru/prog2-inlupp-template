@@ -38,6 +38,7 @@ public class StationView extends Circle{
             }
         });
 
+        updateLabelPosition();
         dragAndDrop();
     }
 
