@@ -1,28 +1,38 @@
 package se.su.inlupp;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import javafx.scene.Group;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.shape.Shape;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 
-public class StationView extends Circle{
+public class StationView extends Group{
     private final Station station;
     private final Text label;
 
-    private double mouseStartPositionX;
-    private double mouseStartPositionY;
+    private final Set<Color> activeLineColors = new HashSet<>();
+
+    private Shape visualShape;
+
+    private final javafx.beans.property.DoubleProperty centerX = new javafx.beans.property.SimpleDoubleProperty();
+    private final javafx.beans.property.DoubleProperty centerY = new javafx.beans.property.SimpleDoubleProperty();
     
     public StationView(Station station, double x, double y) {
-        super(x, y, 16);
         this.station = station;
-
-        this.setFill(Color.WHITE);
-        this.setStroke(Color.BLACK);
-        this.setStrokeWidth(2);
+        this.centerX.set(x);
+        this.centerY.set(y);
 
         this.label = new Text(station.getName());
         this.label.setFont(Font.font("Arial", FontWeight.BOLD, 12));
+
+        updateAppearance();
+        this.getChildren().add(label);
 
         this.setOnMouseClicked(e -> {
             if (this.getParent() instanceof Map map && map.isConnecting) {
@@ -38,8 +48,15 @@ public class StationView extends Circle{
             }
         });
 
-        updateLabelPosition();
         dragAndDrop();
+    }
+
+    public javafx.beans.property.DoubleProperty centerXProperty() {
+        return centerX;
+    }
+
+    public javafx.beans.property.DoubleProperty centerYProperty() {
+        return centerY;
     }
 
     public Station getStation() {
@@ -50,31 +67,63 @@ public class StationView extends Circle{
         return label;
     }
 
-    public void updateLabelPosition() {
-        this.label.setX(this.getCenterX() - (this.label.getLayoutBounds().getWidth() / 2));
-        this.label.setY(this.getCenterY() - 18);
+    public Shape getShape() {
+        return visualShape;
+    }
+
+    public void addLineColor(Color color) {
+        activeLineColors.add(color);
+        updateAppearance();
     }
 
     private void dragAndDrop() {
         this.setOnMousePressed(event -> {
-            mouseStartPositionX = event.getX() - this.getCenterX();
-            mouseStartPositionY = event.getY() - this.getCenterY();
-
-            this.setFill(Color.YELLOW);
+            visualShape.setFill(Color.YELLOW);
         });
 
-        this.setOnMouseDragged(event -> {
-            double newX = event.getX() - mouseStartPositionX;
-            double newY = event.getY() - mouseStartPositionY;
+        this.setOnMouseDragged(e -> {
+            centerX.set(e.getX());
+            centerY.set(e.getY());
+            updateAppearance();
 
-            this.setCenterX(newX);
-            this.setCenterY(newY);
-
-            updateLabelPosition();
         });
 
         this.setOnMouseReleased(event -> {
-            this.setFill(Color.WHITE);
+            visualShape.setFill(Color.WHITE);
         });
+    }
+
+    private void updateAppearance() {
+        if (visualShape != null) {
+            this.getChildren().remove(visualShape);
+        }
+
+        int numberOfLines = activeLineColors.size();
+
+        if (numberOfLines <= 1) {
+            Circle circle = new Circle(centerX.get(), centerY.get(), 16);
+            circle.setFill(Color.WHITE);
+            circle.setStroke(Color.BLACK);
+            circle.setStrokeWidth(3);
+            visualShape = circle;
+        }
+        else {
+            double width = 30 + (numberOfLines * 15);
+            double height = 32;
+
+            Rectangle rectangle = new Rectangle(centerX.get() - width/2, centerY.get() - height/2, width, height);
+            rectangle.setArcWidth(12);
+            rectangle.setArcHeight(12);
+            rectangle.setFill(Color.WHITE);
+            rectangle.setStroke(Color.GREY);
+            rectangle.setStrokeWidth(3);
+
+            visualShape = rectangle;
+        }
+
+        this.getChildren().add(0, visualShape);
+
+        label.setX(centerX.get() - (label.getLayoutBounds().getWidth() / 2));
+        label.setY(centerY.get() - 25);
     }
 }

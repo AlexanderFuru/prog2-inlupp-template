@@ -61,7 +61,7 @@ public class Map extends Pane {
             isConnecting = false;
 
             if (firstSelectedStation != null) {
-                firstSelectedStation.setFill(javafx.scene.paint.Color.WHITE);
+                firstSelectedStation.getShape().setFill(javafx.scene.paint.Color.WHITE);
                 System.out.println("Connect mode has been canceled");
                 return;
             }
@@ -135,7 +135,7 @@ public class Map extends Pane {
     public void chooseConnectingStations(StationView clickedStation) {
         if (firstSelectedStation == null) {
             firstSelectedStation = clickedStation;
-            firstSelectedStation.setFill(javafx.scene.paint.Color.GREEN);
+            firstSelectedStation.getShape().setFill(javafx.scene.paint.Color.GREEN);
             System.out.println("Connecting stations...First station has been selected: " + firstSelectedStation.getStation().getName() + ", choose the second station");
         }
         else {
@@ -153,7 +153,7 @@ public class Map extends Pane {
                 connectStations(firstSelectedStation, clickedStation, testEdge);
             }
             
-            firstSelectedStation.setFill(javafx.scene.paint.Color.WHITE);
+            firstSelectedStation.getShape().setFill(javafx.scene.paint.Color.WHITE);
             System.out.println("Stations " + firstSelectedStation.getStation().getName() + " and " + clickedStation.getStation().getName() + " have been connected");
             System.out.println("Exiting connect mode");
             isConnecting = false;
@@ -162,13 +162,15 @@ public class Map extends Pane {
     }
 
     private void connectStations(StationView station1, StationView station2, GraphEdge<Station> edge) {
-        EdgeLine edgeView = new EdgeLine(station1, station2, edge, currentTransitLine.getColor());
+        EdgeLine edgeLine = new EdgeLine(station1, station2, edge, currentTransitLine.getColor());
+
+        station1.addLineColor(currentTransitLine.getColor());
+        station2.addLineColor(currentTransitLine.getColor());
+
+        this.getChildren().add(edgeLine);
+        edgeLine.toBack();
 
         //Skicka till modellen att den ska koppla två noder
-
-        this.getChildren().add(edgeView);
-
-        edgeView.toBack();
     }
 
     //#endregion
@@ -184,7 +186,7 @@ public class Map extends Pane {
     public void chooseStationToRemove(StationView clickedStation) {
         if (stationToRemove == null) {
             stationToRemove = clickedStation;
-            removeStation(clickedStation);
+            removeStation();
         }
     }
 
@@ -195,9 +197,7 @@ public class Map extends Pane {
         }
     }
 
-    private void removeStation(StationView clickedStaion) {
-        Station station = clickedStaion.getStation();
-
+    private void removeStation() {
         List<EdgeLine> linesToRemove = new ArrayList<>();
         for (javafx.scene.Node node : this.getChildren()) {
             if (node instanceof EdgeLine edgeLine) {
@@ -211,7 +211,7 @@ public class Map extends Pane {
         this.getChildren().remove(stationToRemove);
         this.getChildren().remove(stationToRemove.getLabel());
 
-        //Skicka till modellen att station ska tas bort
+        //Skicka till modellen att station och dess edges ska tas bort
         
         System.out.println(stationToRemove.getStation().getName() + " Has been removed");
         System.out.println("Exiting station remove mode");
@@ -220,7 +220,6 @@ public class Map extends Pane {
     }
 
     private void removeLine(EdgeLine clickedLine) {
-        GraphEdge<Station> edge = clickedLine.getEdgeData();
 
         //Skicka till modellen att edge ska tas bort
 
