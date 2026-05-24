@@ -35,6 +35,10 @@ public class EdgeLine extends Line {
         });
     }
 
+    public int getLineWidth() {
+        return lineWidth;
+    }
+
     public GraphEdge<Station> getEdgeData() {
         return edgeData;
     }

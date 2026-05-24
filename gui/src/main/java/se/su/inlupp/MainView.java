@@ -120,8 +120,6 @@ public class MainView extends BorderPane {
     }
 
     private void handleOpen() {
-        System.out.println("Operation -Open- has been chosen");
-
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Open file");
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Textfiler (*.txt)", "*.txt"));
@@ -165,7 +163,7 @@ public class MainView extends BorderPane {
     }
 
     private void handleFindRoute() {
-        System.out.println("Operation -Find route- has been chosen");
+        map.startChoosingRouteEndPoints();
     }
 
     private void handleAlgorithmChange(String selectedAlgorithm) {

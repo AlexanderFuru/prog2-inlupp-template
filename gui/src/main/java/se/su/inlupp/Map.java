@@ -5,24 +5,28 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
 
 public class Map extends Pane {
     private final ImageView backgroundImageView;
 
     private StationView firstSelectedStation;
     private StationView stationToRemove;
+    private StationView stationToStartRouteFrom;
 
     private EdgeLine lineToRemove;
     private TransitLine currentTransitLine;
 
     protected boolean isConnecting = false;
     protected boolean isRemoving = false;
+    protected boolean isChoosingRoute = false;
 
     public Map() {
         this.backgroundImageView = new ImageView();
@@ -31,7 +35,7 @@ public class Map extends Pane {
 
         this.getChildren().add(backgroundImageView);
 
-        setupMouseListeners();
+        setupMouseClick();
     }
 
     //#region Map
@@ -45,7 +49,7 @@ public class Map extends Pane {
         }
     }
 
-    private void setupMouseListeners() {
+    private void setupMouseClick() {
         this.setOnMouseClicked(event -> {
             if (event.getTarget() == this || event.getTarget() == backgroundImageView) {
                 double x = event.getX();
@@ -61,7 +65,7 @@ public class Map extends Pane {
             isConnecting = false;
 
             if (firstSelectedStation != null) {
-                firstSelectedStation.getShape().setFill(javafx.scene.paint.Color.WHITE);
+                firstSelectedStation.getShape().setFill(Color.WHITE);
                 System.out.println("Connect mode has been canceled");
                 return;
             }
@@ -75,6 +79,74 @@ public class Map extends Pane {
         handleNewStation(x, y);
             
         System.out.println("Input detected at " + x + ", " + y);
+    }
+
+    public void startChoosingRouteEndPoints() {
+        isChoosingRoute = true;
+        stationToStartRouteFrom = null;
+        System.out.println("Calculating route...Choose start station");
+    }
+
+    public void chooseRouteEndPoints(StationView clickedStation) {
+        if (stationToStartRouteFrom == null) {
+            stationToStartRouteFrom = clickedStation;
+            stationToStartRouteFrom.getShape().setFill(Color.YELLOW);
+            System.out.println("Start station has been selected: " + clickedStation.getStation().getName());
+        }
+        else {
+            if (stationToStartRouteFrom == clickedStation) {
+                DialogHandler.showErrorAlert("Error", "Invalid choice", "A route cannot have the same start and end stations");
+                return;
+            }
+
+            Station fromStation = stationToStartRouteFrom.getStation();
+            Station toStation = clickedStation.getStation();
+
+            GraphEdge<Station> testEdge = new GraphEdge<>(toStation, "Test Edge", 2);
+            List<GraphEdge<Station>> testEdges = new ArrayList<>();
+            testEdges.add(testEdge);
+            
+            GraphPath<Station> testPath = new GraphPath(fromStation, testEdges);
+
+            visualizeRoute(testPath);
+            isChoosingRoute = false;
+            stationToStartRouteFrom = null;
+        } 
+    }
+
+    public void visualizeRoute(GraphPath<Station> path) {
+        resetRouteVisuals();
+
+        if (path == null || path.getEdges().isEmpty())
+            return;
+
+        Station fromStation = path.getStart();
+        Station toStation = path.getEnd();
+
+        for (Node node : this.getChildren())
+            if (node instanceof StationView stationView) {
+                Station currentStation = stationView.getStation();
+
+                if (currentStation.equals(fromStation) || currentStation.equals(toStation)) {
+                    stationView.getShape().setFill(Color.BLUE);
+                }
+            }
+
+        for (Node node : this.getChildren()) {
+                if (node instanceof EdgeLine edgeLine) {
+                    edgeLine.setStrokeWidth(edgeLine.getLineWidth() * 2);
+                }
+            }
+        }
+
+    public void resetRouteVisuals() {
+        for (Node node : this.getChildren()) {
+            if (node instanceof EdgeLine edgeLine)
+                edgeLine.setStrokeWidth(edgeLine.getLineWidth());
+
+            if (node instanceof StationView stationView)
+                stationView.updateAppearance();
+        }
     }
 
     //#endregion
@@ -135,7 +207,7 @@ public class Map extends Pane {
     public void chooseConnectingStations(StationView clickedStation) {
         if (firstSelectedStation == null) {
             firstSelectedStation = clickedStation;
-            firstSelectedStation.getShape().setFill(javafx.scene.paint.Color.GREEN);
+            firstSelectedStation.getShape().setFill(Color.GREEN);
             System.out.println("Connecting stations...First station has been selected: " + firstSelectedStation.getStation().getName() + ", choose the second station");
         }
         else {
@@ -153,7 +225,7 @@ public class Map extends Pane {
                 connectStations(firstSelectedStation, clickedStation, testEdge);
             }
             
-            firstSelectedStation.getShape().setFill(javafx.scene.paint.Color.WHITE);
+            firstSelectedStation.getShape().setFill(Color.WHITE);
             System.out.println("Stations " + firstSelectedStation.getStation().getName() + " and " + clickedStation.getStation().getName() + " have been connected");
             System.out.println("Exiting connect mode");
             isConnecting = false;
@@ -199,7 +271,7 @@ public class Map extends Pane {
 
     private void removeStation() {
         List<EdgeLine> linesToRemove = new ArrayList<>();
-        for (javafx.scene.Node node : this.getChildren()) {
+        for (Node node : this.getChildren()) {
             if (node instanceof EdgeLine edgeLine) {
                 if (edgeLine.getFromStationView() == stationToRemove || edgeLine.getToStationView() == stationToRemove) {
                     linesToRemove.add(edgeLine);

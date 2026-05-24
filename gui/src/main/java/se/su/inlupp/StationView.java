@@ -46,6 +46,12 @@ public class StationView extends Group{
 
                 e.consume();
             }
+
+            if (this.getParent() instanceof Map map && map.isChoosingRoute) {
+                map.chooseRouteEndPoints(this);
+
+                e.consume();
+            }
         });
 
         dragAndDrop();
@@ -77,23 +83,14 @@ public class StationView extends Group{
     }
 
     private void dragAndDrop() {
-        this.setOnMousePressed(event -> {
-            visualShape.setFill(Color.YELLOW);
-        });
-
         this.setOnMouseDragged(e -> {
             centerX.set(e.getX());
             centerY.set(e.getY());
             updateAppearance();
-
-        });
-
-        this.setOnMouseReleased(event -> {
-            visualShape.setFill(Color.WHITE);
         });
     }
 
-    private void updateAppearance() {
+    public void updateAppearance() {
         if (visualShape != null) {
             this.getChildren().remove(visualShape);
         }
@@ -105,6 +102,7 @@ public class StationView extends Group{
             circle.setFill(Color.WHITE);
             circle.setStroke(Color.BLACK);
             circle.setStrokeWidth(3);
+
             visualShape = circle;
         }
         else {
