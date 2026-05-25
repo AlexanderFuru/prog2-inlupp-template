@@ -9,7 +9,7 @@ public class EdgeLine extends Line {
     private final StationView fromStationView;
     private final StationView toStationView;
 
-    private final int lineWidth = 4;
+    private final int lineWidth = 8;
 
     public EdgeLine(StationView fromStationView, StationView toStationView, GraphEdge<Station> edgeData, Color color) {
         this.fromStationView = fromStationView;
@@ -27,7 +27,7 @@ public class EdgeLine extends Line {
         this.toBack();
 
         this.setOnMouseClicked(e -> {
-            if (this.getParent() instanceof Map map && map.isRemoving) {
+            if (this.getParent() instanceof Map map && map.getIsRemoving()) {
                 map.chooseLineToRemove(this);
 
                 e.consume();

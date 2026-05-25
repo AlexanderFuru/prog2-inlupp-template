@@ -40,6 +40,8 @@ public class MainView extends BorderPane {
 
         this.map = new Map();
         this.setCenter(map);
+
+        handleChangeTransitLine();
     }
 
     private MenuBar createMenuBar() {
@@ -80,11 +82,19 @@ public class MainView extends BorderPane {
         Button findRouteButton = new Button("Find route");
         findRouteButton.setOnAction(e -> handleFindRoute());
 
+        Button clearRouteButton = new Button("Clear route");
+        clearRouteButton.setOnAction(e -> handleClearRoute());
+
         transitLineSelectionBox = new ComboBox<>();
         transitLineSelectionBox.setPromptText("Select current transit line");
         transitLineSelectionBox.getItems().add(new TransitLine("Green Line", Color.GREEN));
         transitLineSelectionBox.getItems().add(new TransitLine("Red Line", Color.RED));
         transitLineSelectionBox.setValue(transitLineSelectionBox.getItems().get(0));
+        transitLineSelectionBox.getSelectionModel().selectedItemProperty().addListener((obj, oldLine, newLine) -> {
+            if (newLine != null) {
+                handleChangeTransitLine();
+            }
+        });
 
         ComboBox<String> algorithmBox = new ComboBox<>();
         algorithmBox.getItems().addAll("Fastest route (BFS)", "Fewest transfers (DFS)");
@@ -95,7 +105,7 @@ public class MainView extends BorderPane {
         newTransitLineButton, new Label("Current transit line: "), transitLineSelectionBox, new Separator(), 
         connectStationsClickButton,  new Separator(), 
         removeStationButton, new Separator(), 
-        new Label("Algorithm: "), algorithmBox, findRouteButton);
+        new Label("Algorithm: "), algorithmBox, findRouteButton, clearRouteButton);
 
         return toolBar;
     }
@@ -146,12 +156,14 @@ public class MainView extends BorderPane {
             TransitLine transitLine = newTransitLine.get();
             transitLineSelectionBox.getItems().add(transitLine);
             transitLineSelectionBox.setValue(transitLine);
-
-            //TO-DO: Fixa så att den uppdateras varje gång en linje väljs
             map.setCurrentTransitLine(transitLineSelectionBox);
 
             System.out.println("New line created: " + transitLine.getName());
         }
+    }
+
+    private void handleChangeTransitLine() {
+        map.setCurrentTransitLine(transitLineSelectionBox);
     }
 
     private void handleConnectStations() {
@@ -166,7 +178,14 @@ public class MainView extends BorderPane {
         map.startChoosingRouteEndPoints();
     }
 
+    private void handleClearRoute() {
+        map.resetRouteVisuals();
+    }
+
     private void handleAlgorithmChange(String selectedAlgorithm) {
+
+        //RoutePlanner: Sätt nuvarande algoritm baserat på val
+
         if (selectedAlgorithm.contains("BFS")) {
             System.out.println("Fastest route has been chosen");
         }

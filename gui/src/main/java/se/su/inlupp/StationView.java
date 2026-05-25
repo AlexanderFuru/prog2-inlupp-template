@@ -35,19 +35,19 @@ public class StationView extends Group{
         this.getChildren().add(label);
 
         this.setOnMouseClicked(e -> {
-            if (this.getParent() instanceof Map map && map.isConnecting) {
+            if (this.getParent() instanceof Map map && map.getIsConnecting()) {
                 map.chooseConnectingStations(this);
 
                 e.consume();
             }
 
-            if (this.getParent() instanceof Map map && map.isRemoving) {
+            if (this.getParent() instanceof Map map && map.getIsRemoving()) {
                 map.chooseStationToRemove(this);
 
                 e.consume();
             }
 
-            if (this.getParent() instanceof Map map && map.isChoosingRoute) {
+            if (this.getParent() instanceof Map map && map.getIsChoosingRoute()) {
                 map.chooseRouteEndPoints(this);
 
                 e.consume();
@@ -95,6 +95,7 @@ public class StationView extends Group{
             this.getChildren().remove(visualShape);
         }
 
+        //TO-DO: Fixa så att den faktiskt kan känna av hur många olika linjer den är kopplad till
         int numberOfLines = activeLineColors.size();
 
         if (numberOfLines <= 1) {
