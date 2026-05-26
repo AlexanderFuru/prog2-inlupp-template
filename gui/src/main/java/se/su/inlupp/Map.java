@@ -3,6 +3,7 @@ package se.su.inlupp;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import javafx.scene.Node;
@@ -64,6 +65,8 @@ public class Map extends Pane {
 private void handleMapClick(double x, double y) {
 
     if (isChoosingRoute) {
+        isChoosingRoute = false;
+        System.out.println("Route canceled");
         return;
     }
 
@@ -82,6 +85,42 @@ private void handleMapClick(double x, double y) {
     handleNewStation(x, y);
 }
 
+private void resetSelections() {
+    isChoosingRoute = false;
+    isConnecting = false;
+    isRemoving = false;
+
+    if (firstSelectedStation != null)
+        firstSelectedStation.updateAppearance();
+
+    if (stationToStartRouteFrom != null)
+        stationToStartRouteFrom.updateAppearance();
+
+    firstSelectedStation = null;
+    stationToStartRouteFrom = null;
+    stationToRemove = null;
+    lineToRemove = null;
+}
+
+private boolean checkIfStationsOnMap() {
+    for (Node node : getChildren()) {
+        if (node instanceof StationView stationView) {
+            if (stationView != null) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+private boolean checkIfEnoughStationsOnMap() {
+    if (stations.size() > 1)
+        return true;
+    
+    else
+        return false;
+}
+
     //#endregion
 
     //#region Route
@@ -91,9 +130,14 @@ private void handleMapClick(double x, double y) {
     }
 
     public void startChoosingRouteEndPoints() {
-        isChoosingRoute = true;
-        stationToStartRouteFrom = null;
-        System.out.println("Calculating route...Choose start station");
+        if (!checkIfEnoughStationsOnMap()) {
+            DialogHandler.showErrorAlert("Error", "No stations present on map", "Please create at least two stations before attempting to find route");
+        }
+        else {
+            resetSelections();
+            isChoosingRoute = true;
+            System.out.println("Calculating route...Choose start station");
+        }       
     }
 
     public void chooseRouteEndPoints(StationView clickedStation) {
@@ -131,7 +175,6 @@ private void handleMapClick(double x, double y) {
 
         visualizeRoute(path);
 
-        stationToStartRouteFrom.getShape().setFill(Color.WHITE);
         stationToStartRouteFrom = null;
 
         System.out.println("route completed");
@@ -161,6 +204,8 @@ private void handleMapClick(double x, double y) {
                     edgeLine.setStrokeWidth(edgeLine.getLineWidth() * 2);
                 }
             }
+
+            resetSelections();
         }
 
     public void resetRouteVisuals() {
@@ -172,6 +217,7 @@ private void handleMapClick(double x, double y) {
                 stationView.updateAppearance();
         }
 
+        resetSelections();
         System.out.println("Route has been cleared");
     }
 
@@ -193,6 +239,16 @@ private void handleMapClick(double x, double y) {
 
         if (result.isPresent()) {
             String stationName = result.get().trim();
+
+            for (Node node : this.getChildren()) {
+                if (node instanceof StationView stationView) {
+                    if (Objects.equals(stationName, stationView.getStation().getName())) {
+                        DialogHandler.showErrorAlert("Error", "Name already exists", "Please enter a new name");
+                        handleNewStation(mouseClickX, mouseClickY);
+                        return;
+                    }
+                }               
+            }
 
             if (stationName.isEmpty()) {
                 Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -246,10 +302,29 @@ private void handleMapClick(double x, double y) {
         return isConnecting;
     }
 
+    private boolean isConnected(StationView station1, StationView station2)
+    {
+        for (Node node : this.getChildren()) {
+            if (node instanceof EdgeLine edgeLine) {
+                StationView fromStation = edgeLine.getFromStationView();
+                StationView toStation = edgeLine.getToStationView();
+
+                if ((fromStation == station1 && toStation == station2) || (fromStation == station2 && toStation == station1))
+                    return true;
+            }
+        }
+        return false;
+    }
+
     public void startConnectingStations() {
-        this.isConnecting = true;
-        this.firstSelectedStation = null;
-        System.out.println("Connecting stations...Choose the first station");
+        if (!checkIfEnoughStationsOnMap()) {
+            DialogHandler.showErrorAlert("Error", "No stations present on map", "Please create at least two stations before attempting to find route");
+        }
+        else {
+            resetSelections();
+            isConnecting = true;
+            System.out.println("Connecting stations...Choose the first station");
+        }
     }
 
     public void chooseConnectingStations(StationView clickedStation) {
@@ -261,35 +336,39 @@ private void handleMapClick(double x, double y) {
         else {
             if (firstSelectedStation == clickedStation) {
                 DialogHandler.showErrorAlert("Error", "Invalid connection", "A station cannot be connected to itself");
+                resetSelections();
+                firstSelectedStation.updateAppearance();
                 return;
             }
 
+            if (isConnected(firstSelectedStation, clickedStation)) {
+                DialogHandler.showErrorAlert("Error", "Invalid connection", "Stations already have connections");
+                resetSelections();
+                firstSelectedStation.updateAppearance();
+                return;
+            }
+                
             Optional<DialogHandler.LineInputData> input = DialogHandler.showConnectDialog(firstSelectedStation.getStation().getName(), clickedStation.getStation().getName());
             if (input.isPresent()) {
                 DialogHandler.LineInputData inputData = input.get();
 
-                //Skicka till modellen att den ska koppla två noder istället
-                GraphEdge<Station> testEdge = new GraphEdge<>(clickedStation.getStation(), currentTransitLine.getName(), inputData.weight);
-
                 System.out.println("Second station has been selected: " + clickedStation.getStation().getName());
-                routePlanner.connectStations(firstSelectedStation.getStation(), clickedStation.getStation(), currentTransitLine.getName(), inputData.weight);
-                connectStations(firstSelectedStation, clickedStation, testEdge);
+                connectStations(firstSelectedStation, clickedStation, inputData.weight);
             }
             
             firstSelectedStation.getShape().setFill(Color.WHITE);
             System.out.println("Stations " + firstSelectedStation.getStation().getName() + " and " + clickedStation.getStation().getName() + " have been connected");
             System.out.println("Exiting connect mode");
-            isConnecting = false;
-            firstSelectedStation = null;
+
+            resetSelections();
         }
     }
 
-    private void connectStations(StationView station1, StationView station2, GraphEdge<Station> edge) {
+    private void connectStations(StationView station1, StationView station2, int inputData) {
 
         EdgeLine edgeLine = new EdgeLine(
             station1,
             station2,
-            edge,
             currentTransitLine.getColor()
         );
 
@@ -302,8 +381,8 @@ private void handleMapClick(double x, double y) {
         routePlanner.connectStations(
             station1.getStation(),
             station2.getStation(),
-            edge.getName(),
-            edge.getWeight()
+            currentTransitLine.getName(),
+            inputData
         );
     }
 
@@ -320,9 +399,13 @@ private void handleMapClick(double x, double y) {
     }
 
     public void startRemovingObject() {
+        if (!checkIfStationsOnMap()) {
+            DialogHandler.showErrorAlert("Error", "No objects present on map", "Please create at least one objects before attampting to remove them");
+        }
+        else {
+            resetSelections();
         isRemoving = true;
-        stationToRemove = null;
-        lineToRemove = null;
+        }
     }
 
     public void chooseStationToRemove(StationView clickedStation) {
@@ -345,7 +428,6 @@ private void handleMapClick(double x, double y) {
         for (Node node : this.getChildren()) {
             if (node instanceof EdgeLine edgeLine) {
                 if (edgeLine.getFromStationView() == stationToRemove || edgeLine.getToStationView() == stationToRemove) {
-                    routePlanner.removeStation(stationToRemove.getStation());
                     linesToRemove.add(edgeLine);
                 }
             }
@@ -355,28 +437,24 @@ private void handleMapClick(double x, double y) {
         this.getChildren().remove(stationToRemove);
         this.getChildren().remove(stationToRemove.getLabel());
 
-        //RoutePlanner: Skicka att den ska ta bort stationToRemove.getStation();
+        routePlanner.removeStation(stationToRemove.getStation());
         
         System.out.println(stationToRemove.getStation().getName() + " Has been removed");
         System.out.println("Exiting station remove mode");
-        stationToRemove = null;
-        isRemoving = false;
+
+        resetSelections();
     }
 
     private void removeLine(EdgeLine clickedLine) {
-
-        //RoutePlanner: Skicka att den ska ta bort edge, via disconnect
-
         clickedLine.getFromStationView().updateAppearance();
         clickedLine.getToStationView().updateAppearance();
         routePlanner.disconnectStations(clickedLine.getFromStationView().getStation(),clickedLine.getToStationView().getStation());
 
         this.getChildren().remove(clickedLine);
-        System.out.println(clickedLine.getEdgeData().getName() + " has been removed");
-        lineToRemove = null;
-        isRemoving = false;
+        System.out.println(clickedLine + " has been removed");
+        
+        resetSelections();
     }
 
     //#endregion
-
 }

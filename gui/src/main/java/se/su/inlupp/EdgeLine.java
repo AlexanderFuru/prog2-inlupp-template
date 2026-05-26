@@ -5,16 +5,15 @@ import javafx.scene.shape.Line;
 
 public class EdgeLine extends Line {
     
-    private final GraphEdge<Station> edgeData;
     private final StationView fromStationView;
     private final StationView toStationView;
 
     private final int lineWidth = 8;
 
-    public EdgeLine(StationView fromStationView, StationView toStationView, GraphEdge<Station> edgeData, Color color) {
+    public EdgeLine(StationView fromStationView, StationView toStationView, Color color) {
         this.fromStationView = fromStationView;
         this.toStationView = toStationView;
-        this.edgeData = edgeData;
+        // this.edgeData = edgeData;
 
         this.setStroke(color);
         this.setStrokeWidth(lineWidth);
@@ -39,9 +38,9 @@ public class EdgeLine extends Line {
         return lineWidth;
     }
 
-    public GraphEdge<Station> getEdgeData() {
-        return edgeData;
-    }
+    // public GraphEdge<Station> getEdgeData() {
+    //     return edgeData;
+    // }
 
     public StationView getFromStationView() {
         return fromStationView;
