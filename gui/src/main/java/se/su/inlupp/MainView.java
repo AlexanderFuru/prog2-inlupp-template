@@ -38,7 +38,7 @@ public class MainView extends BorderPane {
         VBox topContainer = new VBox(menuBar, toolBar);
         this.setTop(topContainer);
 
-        this.map = new Map();
+        this.map = new Map(new RoutePlanner(new BFSPathFinder<>()));
         this.setCenter(map);
 
         handleChangeTransitLine();
@@ -184,13 +184,13 @@ public class MainView extends BorderPane {
 
     private void handleAlgorithmChange(String selectedAlgorithm) {
 
-        //RoutePlanner: Sätt nuvarande algoritm baserat på val
-
         if (selectedAlgorithm.contains("BFS")) {
-            System.out.println("Fastest route has been chosen");
+            map.getRoutePlanner().setPathFinder(new BFSPathFinder<>());
+            System.out.println("BFS selected");
         }
         else {
-            System.out.println("Fewest transfers has been chosen");
+            map.setAlgorithm(new DFSPathFinder<>());
+            System.out.println("DFS selected");
         }
     }
 

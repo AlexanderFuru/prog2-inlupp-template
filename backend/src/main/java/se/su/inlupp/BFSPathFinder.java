@@ -106,8 +106,7 @@ public class BFSPathFinder<T> implements PathFinder<T> {
 
         @Override
         public String toString() {
-            return "Path: " + getNodes() +
-                    ", total weight = " + getTotalWeight();
+            return "Path: " + getNodes() + ", total weight = " + getTotalWeight();
         }
     }
 }

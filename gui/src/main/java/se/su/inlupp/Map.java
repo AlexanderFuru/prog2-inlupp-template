@@ -23,19 +23,20 @@ public class Map extends Pane {
 
     private EdgeLine lineToRemove;
     private TransitLine currentTransitLine;
+    private final RoutePlanner routePlanner;
 
     private boolean isConnecting = false;
     private boolean isRemoving = false;
     private boolean isChoosingRoute = false;
 
-    public Map() {
-        this.backgroundImageView = new ImageView();
+    private final List<Station> stations = new ArrayList<>();
 
-        this.backgroundImageView.setPreserveRatio(true);
-
-        this.getChildren().add(backgroundImageView);
-
-        setupMouseClick();
+    public Map(RoutePlanner routePlanner) {
+    this.routePlanner = routePlanner;
+    this.backgroundImageView = new ImageView();
+    this.backgroundImageView.setPreserveRatio(true);
+    this.getChildren().add(backgroundImageView);
+    setupMouseClick();
     }
 
     //#region Map
@@ -60,26 +61,26 @@ public class Map extends Pane {
         });
     }
 
-    private void handleMapClick(double x, double y) {
-        if (isConnecting) {
-            isConnecting = false;
+private void handleMapClick(double x, double y) {
 
-            if (firstSelectedStation != null) {
-                firstSelectedStation.getShape().setFill(Color.WHITE);
-                System.out.println("Connect mode has been canceled");
-                return;
-            }
-        }
-
-        if (isRemoving) {
-            isRemoving = false;
-            System.out.println("Remove mode has been canceled");
-        }
-
-        handleNewStation(x, y);
-            
-        System.out.println("Input detected at " + x + ", " + y);
+    if (isChoosingRoute) {
+        return;
     }
+
+    if (isConnecting) {
+        isConnecting = false;
+        System.out.println("connect canceled");
+        return;
+    }
+
+    if (isRemoving) {
+        isRemoving = false;
+        System.out.println("remove canceled");
+        return;
+    }
+
+    handleNewStation(x, y);
+}
 
     //#endregion
 
@@ -96,39 +97,48 @@ public class Map extends Pane {
     }
 
     public void chooseRouteEndPoints(StationView clickedStation) {
+
+
         if (stationToStartRouteFrom == null) {
             stationToStartRouteFrom = clickedStation;
-            stationToStartRouteFrom.getShape().setFill(Color.YELLOW);
-            System.out.println("Start station has been selected: " + clickedStation.getStation().getName());
+            clickedStation.getShape().setFill(Color.YELLOW);
+
+            System.out.println("Start station selected: "
+                + clickedStation.getStation().getName());
+            return;
         }
-        else {
-            if (stationToStartRouteFrom == clickedStation) {
-                DialogHandler.showErrorAlert("Error", "Invalid choice", "A route cannot have the same start and end stations");
-                return;
-            }
 
-            Station fromStation = stationToStartRouteFrom.getStation();
-            Station toStation = clickedStation.getStation();
+        if (stationToStartRouteFrom == clickedStation) {
+            return;
+        }
 
-            //RoutePlanner: Kör algoritm och ta fram en path istället
-            
-            GraphEdge<Station> testEdge = new GraphEdge<>(toStation, "Test Edge", 2);
-            List<GraphEdge<Station>> testEdges = new ArrayList<>();
-            testEdges.add(testEdge);
-            
-            GraphPath<Station> testPath = new GraphPath(fromStation, testEdges);
+        Station from = stationToStartRouteFrom.getStation();
+        Station to = clickedStation.getStation();
 
-            //RoutePlanner: Hämta path och skicka med för visualisering
+        System.out.println("End station selected: " + to.getName());
 
-            visualizeRoute(testPath);
-            isChoosingRoute = false;
-            stationToStartRouteFrom = null;
-        } 
+        Path<Station> path = routePlanner.getRoute(from, to);
+        int totalTime = calculateTotalTime(path);
+
+        System.out.println("FROM: " + from.getName());
+        System.out.println("TO: " + to.getName());
+        System.out.println("Total travel time: " + totalTime);
+
+        if (path == null || path.getEdges().isEmpty()) {
+            System.out.println("No route found");
+            return;
+        }
+
+        visualizeRoute(path);
+
+        stationToStartRouteFrom.getShape().setFill(Color.WHITE);
+        stationToStartRouteFrom = null;
+
+        System.out.println("route completed");
+        //resetRouteVisuals();
     }
 
-    public void visualizeRoute(GraphPath<Station> path) {
-        resetRouteVisuals();
-
+    public void visualizeRoute(Path<Station> path) {
         if (path == null || path.getEdges().isEmpty())
             return;
 
@@ -165,6 +175,10 @@ public class Map extends Pane {
         System.out.println("Route has been cleared");
     }
 
+    public void setAlgorithm(PathFinder<Station> pathFinder) {
+    routePlanner.setPathFinder(pathFinder);
+    }
+
     //#endregion
 
     //#region AddObjects
@@ -193,19 +207,35 @@ public class Map extends Pane {
             //RoutePlanner: Skicka att den ska lägga till nod istället
             Station newStation = new Station(stationName);
 
+            routePlanner.addStation(newStation);
             addStationToMap(newStation, mouseClickX, mouseClickY);
+            
+
 
             System.out.println("New station has been created: " + stationName);
         }
     }
 
-    public void addStationToMap(Station staion, double x, double y) {
-        StationView stationView = new StationView(staion, x, y);
+    public void addStationToMap(Station station, double x, double y) {
+
+        stations.add(station);
+
+        StationView stationView = new StationView(station, x, y);
         this.getChildren().addAll(stationView.getLabel(), stationView);
     }
 
     public void setCurrentTransitLine(ComboBox<TransitLine> transitLineSelectionBox) {
         currentTransitLine = transitLineSelectionBox.getValue();
+    }
+
+    private int calculateTotalTime(Path<Station> path) {
+    int totalTime = 0;
+
+    for (Edge<Station> edge : path.getEdges()) {
+        totalTime += edge.getWeight();
+    }
+
+    return totalTime;
     }
 
     //#endregion
@@ -242,6 +272,7 @@ public class Map extends Pane {
                 GraphEdge<Station> testEdge = new GraphEdge<>(clickedStation.getStation(), currentTransitLine.getName(), inputData.weight);
 
                 System.out.println("Second station has been selected: " + clickedStation.getStation().getName());
+                routePlanner.connectStations(firstSelectedStation.getStation(), clickedStation.getStation(), currentTransitLine.getName(), inputData.weight);
                 connectStations(firstSelectedStation, clickedStation, testEdge);
             }
             
@@ -254,13 +285,30 @@ public class Map extends Pane {
     }
 
     private void connectStations(StationView station1, StationView station2, GraphEdge<Station> edge) {
-        EdgeLine edgeLine = new EdgeLine(station1, station2, edge, currentTransitLine.getColor());
+
+        EdgeLine edgeLine = new EdgeLine(
+            station1,
+            station2,
+            edge,
+            currentTransitLine.getColor()
+        );
 
         station1.addLineColor(currentTransitLine.getColor());
         station2.addLineColor(currentTransitLine.getColor());
 
         this.getChildren().add(edgeLine);
         edgeLine.toBack();
+
+        routePlanner.connectStations(
+            station1.getStation(),
+            station2.getStation(),
+            edge.getName(),
+            edge.getWeight()
+        );
+    }
+
+    public RoutePlanner getRoutePlanner() {
+    return routePlanner;
     }
 
     //#endregion
@@ -297,6 +345,7 @@ public class Map extends Pane {
         for (Node node : this.getChildren()) {
             if (node instanceof EdgeLine edgeLine) {
                 if (edgeLine.getFromStationView() == stationToRemove || edgeLine.getToStationView() == stationToRemove) {
+                    routePlanner.removeStation(stationToRemove.getStation());
                     linesToRemove.add(edgeLine);
                 }
             }
@@ -320,6 +369,7 @@ public class Map extends Pane {
 
         clickedLine.getFromStationView().updateAppearance();
         clickedLine.getToStationView().updateAppearance();
+        routePlanner.disconnectStations(clickedLine.getFromStationView().getStation(),clickedLine.getToStationView().getStation());
 
         this.getChildren().remove(clickedLine);
         System.out.println(clickedLine.getEdgeData().getName() + " has been removed");
@@ -328,4 +378,5 @@ public class Map extends Pane {
     }
 
     //#endregion
+
 }
