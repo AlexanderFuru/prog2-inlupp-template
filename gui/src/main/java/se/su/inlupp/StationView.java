@@ -1,7 +1,7 @@
 package se.su.inlupp;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 
 import javafx.scene.Group;
 import javafx.scene.paint.Color;
@@ -16,7 +16,7 @@ public class StationView extends Group{
     private final Station station;
     private final Text label;
 
-    private final Set<Color> activeLineColors = new HashSet<>();
+    private final Map<Color, Integer> numberOfLineColors = new HashMap<>();
 
     private Shape visualShape;
 
@@ -33,19 +33,19 @@ public class StationView extends Group{
         this.getChildren().add(label);
 
         this.setOnMouseClicked(e -> {
-            if (this.getParent() instanceof Map map && map.getIsConnecting()) {
+            if (this.getParent() instanceof se.su.inlupp.Map map && map.getIsConnecting()) {
                 map.chooseConnectingStations(this);
 
                 e.consume();
             }
 
-            if (this.getParent() instanceof Map map && map.getIsRemoving()) {
+            if (this.getParent() instanceof se.su.inlupp.Map map && map.getIsRemoving()) {
                 map.chooseStationToRemove(this);
 
                 e.consume();
             }
 
-            if (this.getParent() instanceof Map map && map.getIsChoosingRoute()) {
+            if (this.getParent() instanceof se.su.inlupp.Map map && map.getIsChoosingRoute()) {
                 map.chooseRouteEndPoints(this);
 
                 e.consume();
@@ -76,13 +76,30 @@ public class StationView extends Group{
         return visualShape;
     }
 
+    public Integer getLineColors(Color color) {
+        if (numberOfLineColors.containsKey(color))
+            return numberOfLineColors.get(color);
+
+        else
+            return 0;
+    }
+
     public void addLineColor(Color color) {
-        activeLineColors.add(color);
+        int currentNumber = getLineColors(color);
+        numberOfLineColors.put(color, currentNumber + 1);
         updateAppearance();
     }
 
     public void removeLineColor(Color color) {
-        activeLineColors.remove(color);
+        if (numberOfLineColors.containsKey(color)) {
+            int currentNumber = numberOfLineColors.get(color);
+
+            if (currentNumber > 1)
+                numberOfLineColors.put(color, currentNumber - 1);
+
+            else
+                numberOfLineColors.remove(color);
+        }
         updateAppearance();
     }
 
@@ -99,7 +116,7 @@ public class StationView extends Group{
             this.getChildren().remove(visualShape);
         }
 
-        int numberOfLines = activeLineColors.size();
+        int numberOfLines = numberOfLineColors.size();
 
         if (numberOfLines <= 1) {
             Circle circle = new Circle(centerX.get(), centerY.get(), 16);
