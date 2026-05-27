@@ -162,6 +162,13 @@ private boolean checkIfEnoughStationsOnMap() {
         System.out.println("End station selected: " + to.getName());
 
         Path<Station> path = routePlanner.getRoute(from, to);
+
+        if (path == null || path.getEdges().isEmpty()) {
+            DialogHandler.showErrorAlert("Error", "Invalid route", "The chosen stations are not connected");
+            resetSelections();
+            return;
+        }
+
         int totalTime = calculateTotalTime(path);
 
         System.out.println("FROM: " + from.getName());
