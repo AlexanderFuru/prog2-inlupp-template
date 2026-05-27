@@ -30,8 +30,6 @@ public class StationView extends Group{
 
         this.label = new Text(station.getName());
         this.label.setFont(Font.font("Arial", FontWeight.BOLD, 12));
-
-        updateAppearance();
         this.getChildren().add(label);
 
         this.setOnMouseClicked(e -> {
@@ -54,6 +52,7 @@ public class StationView extends Group{
             }
         });
 
+        updateAppearance();
         dragAndDrop();
     }
 
@@ -82,6 +81,11 @@ public class StationView extends Group{
         updateAppearance();
     }
 
+    public void removeLineColor(Color color) {
+        activeLineColors.remove(color);
+        updateAppearance();
+    }
+
     private void dragAndDrop() {
         this.setOnMouseDragged(e -> {
             centerX.set(e.getX());
@@ -95,7 +99,6 @@ public class StationView extends Group{
             this.getChildren().remove(visualShape);
         }
 
-        //TO-DO: Fixa så att den faktiskt kan känna av hur många olika linjer den är kopplad till
         int numberOfLines = activeLineColors.size();
 
         if (numberOfLines <= 1) {

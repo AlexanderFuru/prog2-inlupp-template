@@ -334,7 +334,7 @@ private boolean checkIfEnoughStationsOnMap() {
 
     public void startConnectingStations() {
         if (!checkIfEnoughStationsOnMap()) {
-            DialogHandler.showErrorAlert("Error", "No stations present on map", "Please create at least two stations before attempting to find route");
+            DialogHandler.showErrorAlert("Error", "No stations present on map", "Please create at least two stations before attempting to connect them");
         }
         else {
             resetSelections();
@@ -449,6 +449,16 @@ private boolean checkIfEnoughStationsOnMap() {
             }
         }
 
+        for (EdgeLine edgeLine : linesToRemove) {
+            Color lineColor = (Color) edgeLine.getStroke();
+
+            StationView adjecentStation = (edgeLine.getFromStationView() == stationToRemove)
+            ? edgeLine.getToStationView()
+            : edgeLine.getFromStationView();
+
+            adjecentStation.removeLineColor(lineColor);
+        }
+
         this.getChildren().removeAll(linesToRemove);
         this.getChildren().remove(stationToRemove);
         this.getChildren().remove(stationToRemove.getLabel());
@@ -462,8 +472,12 @@ private boolean checkIfEnoughStationsOnMap() {
     }
 
     private void removeLine(EdgeLine clickedLine) {
+        Color color = (Color) clickedLine.getStroke();
+        clickedLine.getFromStationView().removeLineColor(color);
+        clickedLine.getToStationView().removeLineColor(color);
         clickedLine.getFromStationView().updateAppearance();
         clickedLine.getToStationView().updateAppearance();
+
         routePlanner.disconnectStations(clickedLine.getFromStationView().getStation(),clickedLine.getToStationView().getStation());
 
         this.getChildren().remove(clickedLine);
