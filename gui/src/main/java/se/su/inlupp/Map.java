@@ -182,13 +182,14 @@ private boolean checkIfEnoughStationsOnMap() {
     }
 
     public void visualizeRoute(Path<Station> path) {
-        if (path == null || path.getEdges().isEmpty())
+        if (path == null || path.getEdges().isEmpty()) {
             return;
+        }
 
         Station fromStation = path.getStart();
         Station toStation = path.getEnd();
 
-        for (Node node : this.getChildren())
+        for (Node node : this.getChildren()) {
             if (node instanceof StationView stationView) {
                 Station currentStation = stationView.getStation();
 
@@ -196,17 +197,32 @@ private boolean checkIfEnoughStationsOnMap() {
                     stationView.getShape().setFill(Color.BLUE);
                 }
             }
+        }
+        List<Edge<Station>> routeEdges = path.getEdges();
+        Station current = path.getStart();
 
-        for (Node node : this.getChildren()) {
+        for (Edge<Station> edge : routeEdges) {
+            Station destination = edge.getDestination();
+
+            for (Node node : this.getChildren()) {
                 if (node instanceof EdgeLine edgeLine) {
 
-                    //RoutePlanner: Hämta vilka edges som utgör path
-                    edgeLine.setStrokeWidth(edgeLine.getLineWidth() * 2);
+                    Station lineFrom = edgeLine.getFromStationView().getStation();
+
+                    Station lineTo = edgeLine.getToStationView().getStation();
+
+                    boolean matches = (lineFrom.equals(current) && lineTo.equals(destination)) || (lineTo.equals(current) && lineFrom.equals(destination));
+
+                    if (matches){
+                        edgeLine.setStrokeWidth(edgeLine.getLineWidth() * 2);
+                    }
                 }
             }
-
-            resetSelections();
+            current = destination;
         }
+
+        resetSelections();
+    }
 
     public void resetRouteVisuals() {
         for (Node node : this.getChildren()) {
