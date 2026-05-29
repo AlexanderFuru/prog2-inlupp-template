@@ -228,6 +228,12 @@ private boolean checkIfEnoughStationsOnMap() {
             current = destination;
         }
 
+        Alert ruttinfo = new Alert(Alert.AlertType.INFORMATION);
+        ruttinfo.setTitle("Route information:");
+        ruttinfo.setHeaderText("Route found!");
+        ruttinfo.setContentText("Total time: " + calculateTotalTime(path) + "\n Amount of stops: " + (routeEdges.size()));
+        ruttinfo.showAndWait();
+
         resetSelections();
     }
 
