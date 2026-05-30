@@ -138,12 +138,33 @@ public class MainView extends BorderPane {
         File file = fileChooser.showOpenDialog(stage);
 
         if (file != null) {
+
+            FileHandler fileHandler = new FileHandler();
+            String imagePath = fileHandler.loadData(map.getRoutePlanner(),file);     
+            map.RebuildMapFromGraph();
+
+            if(imagePath != null){
+             map.setBackgroundImage(new File(imagePath));
+            }
+
             System.out.println("Loading file: " + file.getAbsolutePath());
         }
     }
 
     private void handleSave() {
-        System.out.println("Operation -Save- has been chosen");
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Save file");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Textfiler (*.txt)", "*.txt"));
+
+        Stage stage = (Stage) this.getScene().getWindow();
+        File file = fileChooser.showSaveDialog(stage);
+
+        if (file != null){
+         FileHandler fileHandler = new FileHandler();
+         fileHandler.saveData(map.getRoutePlanner(), map.getImagePath(), file);
+
+         System.out.println("Operation -Save- has been chosen");
+        }
     }
 
     private void handleExit() {

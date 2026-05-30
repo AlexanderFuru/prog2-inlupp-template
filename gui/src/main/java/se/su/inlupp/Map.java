@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.HashMap;
 
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
@@ -26,6 +27,8 @@ public class Map extends Pane {
     private TransitLine currentTransitLine;
     private final RoutePlanner routePlanner;
 
+    private String imagePath;
+
     private boolean isConnecting = false;
     private boolean isRemoving = false;
     private boolean isChoosingRoute = false;
@@ -44,11 +47,18 @@ public class Map extends Pane {
 
     public void setBackgroundImage(File imageFile) {
         if (imageFile != null && imageFile.exists()) {
+
+            imagePath = imageFile.getAbsolutePath();
+
             Image image = new Image(imageFile.toURI().toString());
             backgroundImageView.setImage(image);
 
             this.setPrefSize(image.getWidth(), image.getHeight());
         }
+    }
+
+    public String getImagePath(){
+        return imagePath;
     }
 
     private void setupMouseClick() {
@@ -290,7 +300,7 @@ private boolean checkIfEnoughStationsOnMap() {
             }
 
             //RoutePlanner: Skicka att den ska lägga till nod istället
-            Station newStation = new Station(stationName);
+            Station newStation = new Station(stationName, mouseClickX, mouseClickY);
 
             routePlanner.addStation(newStation);
             addStationToMap(newStation, mouseClickX, mouseClickY);
@@ -500,4 +510,56 @@ private boolean checkIfEnoughStationsOnMap() {
     }
 
     //#endregion
+
+
+
+    // #region Rebuild Map from Graph
+
+    public Color getLineColor(String name){
+            if("Red Line".equals(name)){
+                return Color.RED;
+            }
+        return Color.GREEN;
+    }
+
+    public void RebuildMapFromGraph(){
+     
+     this.getChildren().removeIf(node -> node instanceof StationView || node instanceof EdgeLine);
+
+     stations.clear();
+
+     java.util.Map<Station, StationView> stationViewMap = new HashMap<>();
+
+     for(Station station : routePlanner.getGraph().getNodes()){
+
+        StationView view = new StationView(station, station.getX(), station.getY()); 
+        stations.add(station);
+
+        stationViewMap.put(station, view);
+        this.getChildren().add(view);
+     }
+
+     for (Station from : routePlanner.getGraph().getNodes()){
+       for (Edge<Station> edge : routePlanner.getGraph().getEdgesFrom(from)){
+        
+        Station to = edge.getDestination();
+
+        StationView view1 = stationViewMap.get(from);
+        StationView view2 = stationViewMap.get(to);
+
+        EdgeLine line = new EdgeLine(view1, view2, getLineColor(edge.getName()));
+
+        this.getChildren().add(line);
+        line.toBack();
+        
+        }  
+     }
+     
+     if(imagePath != null && !imagePath.isBlank()){
+        setBackgroundImage(new File(imagePath));
+     }
+
+
+
+    }
 }

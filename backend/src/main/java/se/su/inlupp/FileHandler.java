@@ -42,8 +42,9 @@ public class FileHandler {
             } 
         } 
 
+        if (imagePath != null){
         printWriter.println("IMAGE;" + imagePath);
-
+        }
 
         printWriter.close();
         fileWriter.close();
