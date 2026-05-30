@@ -107,6 +107,9 @@ public class StationView extends Group{
         this.setOnMouseDragged(e -> {
             centerX.set(e.getX());
             centerY.set(e.getY());
+
+            station.setX(e.getX());
+            station.setY(e.getY());
             updateAppearance();
         });
     }

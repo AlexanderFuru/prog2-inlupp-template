@@ -24,7 +24,6 @@ public class Station {
         return y;
     }
 
-    //TO DO: om man flyttar på stationen i vyn ska set-metoderna köras så positionerna uppdateras 
 
     public void setX(double x){
         this.x = x;
