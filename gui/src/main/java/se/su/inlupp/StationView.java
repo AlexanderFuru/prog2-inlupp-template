@@ -147,5 +147,7 @@ public class StationView extends Group{
 
         label.setX(centerX.get() - (label.getLayoutBounds().getWidth() / 2));
         label.setY(centerY.get() - 25);
+
+        this.toFront();
     }
 }

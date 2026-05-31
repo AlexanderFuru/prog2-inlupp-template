@@ -13,7 +13,6 @@ public class EdgeLine extends Line {
     public EdgeLine(StationView fromStationView, StationView toStationView, Color color) {
         this.fromStationView = fromStationView;
         this.toStationView = toStationView;
-        // this.edgeData = edgeData;
 
         this.setStroke(color);
         this.setStrokeWidth(lineWidth);
@@ -37,10 +36,6 @@ public class EdgeLine extends Line {
     public int getLineWidth() {
         return lineWidth;
     }
-
-    // public GraphEdge<Station> getEdgeData() {
-    //     return edgeData;
-    // }
 
     public StationView getFromStationView() {
         return fromStationView;

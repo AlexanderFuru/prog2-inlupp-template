@@ -2,10 +2,10 @@ package se.su.inlupp;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.HashMap;
 
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
@@ -54,6 +54,8 @@ public class Map extends Pane {
             backgroundImageView.setImage(image);
 
             this.setPrefSize(image.getWidth(), image.getHeight());
+
+            backgroundImageView.toBack();
         }
     }
 
@@ -195,7 +197,6 @@ private boolean checkIfEnoughStationsOnMap() {
         stationToStartRouteFrom = null;
 
         System.out.println("route completed");
-        //resetRouteVisuals();
     }
 
     public void visualizeRoute(Path<Station> path) {
@@ -299,13 +300,10 @@ private boolean checkIfEnoughStationsOnMap() {
                 return;
             }
 
-            //RoutePlanner: Skicka att den ska lägga till nod istället
             Station newStation = new Station(stationName, mouseClickX, mouseClickY);
 
             routePlanner.addStation(newStation);
             addStationToMap(newStation, mouseClickX, mouseClickY);
-            
-
 
             System.out.println("New station has been created: " + stationName);
         }
@@ -415,7 +413,6 @@ private boolean checkIfEnoughStationsOnMap() {
         station2.addLineColor(currentTransitLine.getColor());
 
         this.getChildren().add(edgeLine);
-        edgeLine.toBack();
 
         routePlanner.connectStations(
             station1.getStation(),
@@ -423,6 +420,9 @@ private boolean checkIfEnoughStationsOnMap() {
             currentTransitLine.getName(),
             inputData
         );
+
+        station1.updateAppearance();
+        station2.updateAppearance();
     }
 
     public RoutePlanner getRoutePlanner() {

@@ -1,7 +1,6 @@
 package se.su.inlupp;
 
 import java.io.File;
-import java.util.Optional;
 
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -70,9 +69,6 @@ public class MainView extends BorderPane {
     private ToolBar createToolBar() {
         ToolBar toolBar = new ToolBar();
 
-        Button newTransitLineButton = new Button("Create transit line");
-        newTransitLineButton.setOnAction(e -> handleNewTransitLine());
-
         Button connectStationsClickButton = new Button("Connect stations");
         connectStationsClickButton.setOnAction(e -> handleConnectStations());
 
@@ -89,6 +85,9 @@ public class MainView extends BorderPane {
         transitLineSelectionBox.setPromptText("Select current transit line");
         transitLineSelectionBox.getItems().add(new TransitLine("Green Line", Color.GREEN));
         transitLineSelectionBox.getItems().add(new TransitLine("Red Line", Color.RED));
+        transitLineSelectionBox.getItems().add(new TransitLine("Blue Line", Color.BLUE));
+        transitLineSelectionBox.getItems().add(new TransitLine("Yellow Line", Color.YELLOW));
+        transitLineSelectionBox.getItems().add(new TransitLine("Orange Line", Color.ORANGE));
         transitLineSelectionBox.setValue(transitLineSelectionBox.getItems().get(0));
         transitLineSelectionBox.getSelectionModel().selectedItemProperty().addListener((obj, oldLine, newLine) -> {
             if (newLine != null) {
@@ -102,7 +101,7 @@ public class MainView extends BorderPane {
         algorithmBox.setOnAction(e -> handleAlgorithmChange(algorithmBox.getValue() ));
 
         toolBar.getItems().addAll(
-        newTransitLineButton, new Label("Current transit line: "), transitLineSelectionBox, new Separator(), 
+        new Label("Current transit line: "), transitLineSelectionBox, new Separator(), 
         connectStationsClickButton,  new Separator(), 
         removeStationButton, new Separator(), 
         new Label("Algorithm: "), algorithmBox, findRouteButton, clearRouteButton);
@@ -169,18 +168,6 @@ public class MainView extends BorderPane {
 
     private void handleExit() {
         System.out.println("Operation -Exit- has been chosen");
-    }
-
-    private void handleNewTransitLine() {
-        Optional<TransitLine> newTransitLine = DialogHandler.showNewTransitLineDialog();
-        if (newTransitLine.isPresent()) {
-            TransitLine transitLine = newTransitLine.get();
-            transitLineSelectionBox.getItems().add(transitLine);
-            transitLineSelectionBox.setValue(transitLine);
-            map.setCurrentTransitLine(transitLineSelectionBox);
-
-            System.out.println("New line created: " + transitLine.getName());
-        }
     }
 
     private void handleChangeTransitLine() {

@@ -6,7 +6,6 @@ import javafx.geometry.Insets;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -26,44 +25,6 @@ public class DialogHandler {
         alert.setHeaderText(header);
         alert.setContentText(content);
         alert.showAndWait();
-    }
-
-    public static Optional<TransitLine> showNewTransitLineDialog() {
-        Dialog<TransitLine> dialog = new Dialog<>();
-        dialog.setTitle("Create new subway line");
-        dialog.setHeaderText("Input name and choose color");
-
-        ButtonType okButtonType = new ButtonType("Create", ButtonBar.ButtonData.OK_DONE);
-        dialog.getDialogPane().getButtonTypes().addAll(okButtonType, ButtonType.CANCEL);
-
-        GridPane grid = new GridPane();
-        grid.setHgap(10);
-        grid.setVgap(10);
-        grid.setPadding(new Insets(20, 150, 10, 10));
-
-        TextField nameField = new TextField();
-        ColorPicker colorPicker = new ColorPicker(javafx.scene.paint.Color.RED);
-        grid.add(new Label("Line name: "), 0, 0);
-        grid.add(nameField, 1, 0);
-        grid.add(new Label("Color: "), 0, 1);
-        grid.add(colorPicker, 1, 1);
-
-        dialog.getDialogPane().setContent(grid);
-
-        dialog.setResultConverter(dialogButton -> {
-            if (dialogButton == okButtonType) {
-                String name = nameField.getText().trim();
-                if (name.isEmpty()) {
-                    showErrorAlert("Invalid input", "Missing name", "Transit line must have a name");
-                    return null;
-                }
-                return new TransitLine(name, colorPicker.getValue());
-            }
-
-            return null; 
-        });
-
-        return dialog.showAndWait();  
     }
 
     public static Optional<LineInputData> showConnectDialog(String fromName, String toName) {
